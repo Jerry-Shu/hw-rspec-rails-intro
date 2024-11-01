@@ -13,12 +13,15 @@ class Movie < ActiveRecord::Base
     end
   end
 
-  def self.find_in_tmdb(title)
-    return unless title  # Return early if title is nil
+  def self.find_in_tmdb(params)
+    title = params[:title]
+    language = params[:language] || 'en' # Default language to 'en' if not specified
+    return unless title # Return early if title is nil
+  
     api_key = '8daa8c2fa8548598e7f801ccd743f284'
-    uri = "https://api.themoviedb.org/3/search/movie?api_key=#{api_key}&query=#{URI.escape(title)}"
+    uri = "https://api.themoviedb.org/3/search/movie?api_key=#{api_key}&query=#{URI.encode(title)}&language=#{language}"
     response = Faraday.get(uri)
-
+  
     # Parse the JSON response and map it to desired attributes
     movies = JSON.parse(response.body)['results']
     movies.map do |movie|
@@ -29,6 +32,6 @@ class Movie < ActiveRecord::Base
       }
     end
   end
-
+  
 
 end
