@@ -5,7 +5,7 @@ class MoviesController < ApplicationController
   def search_tmdb
     title = params[:title]
     language = params[:language] || 'en'
-    @movies = Movie.find_in_tmdb({title: title, language: language})
+    @movies = Movie.find_in_tmdb({ title: title, language: language })
   end
 
 
