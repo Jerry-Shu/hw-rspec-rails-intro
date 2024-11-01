@@ -9,7 +9,24 @@ class MoviesController < ApplicationController
   end
 
 
+  def add_movie
+    movie_params = {
+      title: params[:title],
+      release_date: params[:release_date],
+      description: params[:overview],
+      # Optionally, add other default attributes here, like rating
+    }
+    
+    movie = Movie.new(movie_params)
+    
+    if movie.save
+      flash[:notice] = "#{movie.title} was successfully added to RottenPotatoes."
+    else
+      flash[:alert] = "Failed to add #{movie.title} to RottenPotatoes."
+    end
 
+    redirect_to search_tmdb_path
+  end
 
 
 
