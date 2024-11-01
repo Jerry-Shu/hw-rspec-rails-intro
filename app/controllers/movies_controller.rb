@@ -2,23 +2,19 @@ class MoviesController < ApplicationController
   before_action :force_index_redirect, only: [:index]
 
   def search_tmdb
-    # Step 1: Check if both title and release_year are empty
     if params[:title].blank? && params[:release_year].blank?
       flash.now[:alert] = "Please enter at least a title or release year to search."
       render :search_tmdb and return
     end
 
-    # Step 2: Fetch movies from TMDb API
     @movies = Movie.find_in_tmdb(title: params[:title], language: params[:language])
 
-    # Step 3: Filter movies by release_year, if provided
     if params[:release_year].present?
       @movies = @movies.select do |movie|
         movie[:release_date].present? && movie[:release_date].strftime("%Y") == params[:release_year]
       end
     end
 
-    # Step 4: Check if no movies matched the search criteria
     if @movies.empty?
       flash.now[:alert] = "No movies matched your search criteria."
     end
