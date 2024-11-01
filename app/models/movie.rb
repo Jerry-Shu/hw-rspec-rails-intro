@@ -13,25 +13,27 @@ class Movie < ActiveRecord::Base
     end
   end
 
-  def self.find_in_tmdb(params)
-    title = params[:title]
-    language = params[:language] || 'en' # Default language to 'en' if not specified
-    return unless title # Return early if title is nil
-  
-    api_key = '8daa8c2fa8548598e7f801ccd743f284'
-    uri = "https://api.themoviedb.org/3/search/movie?api_key=#{api_key}&query=#{URI.encode(title)}&language=#{language}"
-    response = Faraday.get(uri)
-  
-    # Parse the JSON response and map it to desired attributes
-    movies = JSON.parse(response.body)['results']
-    movies.map do |movie|
-      {
-        title: movie['title'],
-        overview: movie['overview'],
-        release_date: Date.parse(movie['release_date'])
-      }
-    end
+  def self.find_in_tmdb(params = {})
+  title = params[:title]
+  language = params[:language] || 'en'
+  return unless title
+
+  api_key = '8daa8c2fa8548598e7f801ccd743f284'
+  uri = "https://api.themoviedb.org/3/search/movie?api_key=#{api_key}&query=#{URI.encode(title)}&language=#{language}"
+  response = Faraday.get(uri)
+
+  movies = JSON.parse(response.body)['results']
+  return [] unless movies # Return an empty array if there are no results
+
+  movies.map do |movie|
+    {
+      title: movie['title'],
+      overview: movie['overview'],
+      release_date: movie['release_date'].present? ? Date.parse(movie['release_date']) : 'N/A' # Only parse if a valid date exists
+    }
   end
+end
+
   
 
 end
